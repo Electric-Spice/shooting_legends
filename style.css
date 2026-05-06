@@ -7,6 +7,12 @@ html, body {
     height: 100%;
 }
 
+@font-face {
+  font-family: "njnaruto";
+  src: url("fonts/njnaruto.ttf");
+  font-size: medium;
+}
+
 #screen{
     background-color: white;
 }

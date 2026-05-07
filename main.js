@@ -1,4 +1,4 @@
-// Colors - #333336, #222224
+// Colors - #333336, #222224, #19191b
 
 // Setup
 const screen = document.getElementById('screen')
@@ -25,6 +25,7 @@ function resizeScreen(GAME_WIDTH, GAME_HEIGHT) {
 resizeScreen(1920, 1080)
 
 // Variable
+let unlocked_levels = 0
 
 // Object
 let play_button
@@ -61,25 +62,25 @@ function changeScene(newScene) {
 
 		case 'Main_Menu':
 			screen.style.backgroundColor = '#222224'
-			play_button = new Button('Play', 960, 700, 400, 100, '#222224', 60, '#333336')
-			option_button = new Button('Options', 960, 900, 400, 100, '#222224', 60, '#333336')
+			play_button = new Button('Play', 960, 730, 400, 100, '#222224', '#333336')
+			option_button = new Button('Options', 960, 900, 400, 100, '#222224', '#333336')
 			break;
 		case 'Level_Select':
 			screen.style.backgroundColor = '#222224'
-			back_button = new Button('Back', 960, 980, 400, 100, '#222224', 60, '#333336')
+			back_button = new Button('Back', 960, 980, 400, 100, '#222224', '#333336')
 			level_buttons = []
 			// Tutorial
-			level_buttons.push(new Button('Tutorial', 260, 540, 400, 100, '#222224', 60, '#333336'))
+			level_buttons.push(new Button('Tutorial', 260, 540, 400, 100, '#222224', '#333336'))
 			// Number Levels
-			level_buttons.push(new Button('1', 660, 400, 100, 100, '#222224', 60, '#333336'))
-			level_buttons.push(new Button('2', 960, 250, 100, 100, '#222224', 60, '#333336'))
-			level_buttons.push(new Button('3', 1260, 400, 100, 100, '#222224', 60, '#333336'))
-			level_buttons.push(new Button('4', 660, 680, 100, 100, '#222224', 60, '#333336'))
-			level_buttons.push(new Button('5', 960, 830, 100, 100, '#222224', 60, '#333336'))
-			level_buttons.push(new Button('6', 1260, 680, 100, 100, '#222224', 60, '#333336'))
-			level_buttons.push(new Button('7', 960, 540, 200, 200, '#222224', 120, '#333336', '#000000', 60))
+			level_buttons.push(new Button('1', 660, 400, 100, 100, (unlocked_levels >= 1) ? '#222224':'#19191b', (unlocked_levels >= 1) ? '#333336':'#222224'))
+			level_buttons.push(new Button('2', 960, 250, 100, 100, (unlocked_levels >= 2) ? '#222224':'#19191b', (unlocked_levels >= 2) ? '#333336':'#222224'))
+			level_buttons.push(new Button('3', 1260, 400, 100, 100, (unlocked_levels >= 3) ? '#222224':'#19191b', (unlocked_levels >= 3) ? '#333336':'#222224'))
+			level_buttons.push(new Button('4', 660, 680, 100, 100, (unlocked_levels >= 4) ? '#222224':'#19191b', (unlocked_levels >= 4) ? '#333336':'#222224'))
+			level_buttons.push(new Button('5', 960, 830, 100, 100, (unlocked_levels >= 5) ? '#222224':'#19191b', (unlocked_levels >= 5) ? '#333336':'#222224'))
+			level_buttons.push(new Button('6', 1260, 680, 100, 100, (unlocked_levels >= 6) ? '#222224':'#19191b', (unlocked_levels >= 6) ? '#333336':'#222224'))
+			level_buttons.push(new Button('7', 960, 540, 200, 200, (unlocked_levels >= 7) ? '#222224':'#19191b', (unlocked_levels >= 7) ? '#333336':'#222224'))
 			// Endless
-			level_buttons.push(new Button('Endless', 1660, 540, 400, 100, '#222224', 60, '#333336'))
+			level_buttons.push(new Button('Endless', 1660, 540, 400, 100, (unlocked_levels >= 8) ? '#222224':'#19191b', (unlocked_levels >= 8) ? '#333336':'#222224'))
 			break;
 		default:
 			screen.style.backgroundColor = '#ffffff'
@@ -97,7 +98,9 @@ function draw() {
 	switch (scene) {
 		case 'Start_Up_Loading':
 			// Loading Text
-			ctx.font = '100px njnaruto'
+			ctx.font = '12px njnaruto'
+			ctx.fillText('.', 960, 540)
+			ctx.font = '100px ariel'
 			ctx.lineWidth = 35;        
 			ctx.textAlign = "center"
 			ctx.fillStyle = '#ffffff'
@@ -134,7 +137,7 @@ function draw() {
 			// Button
 
 			// Level Buttons
-			for(level_button of level_buttons) {
+			for(let level_button of level_buttons) {
 				// Button - Clicked
 				if(level_button.checkIfClicked()) {
 					changeScene('Main_Menu')

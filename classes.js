@@ -1,19 +1,19 @@
 class Button {
-    constructor(text, x, y, width, height, textfill='black', textsize=60, fill='white', border='black', lineWidth=30) {
+    constructor(text, x, y, width, height, textfill='black', fill='white', border='black') {
         this.text = text
-        this.x = x
-        this.y = y
+        this.x = x - (width/2)
+        this.y = y - (height/2)
         this.width = width
         this.height = height
         this.textfill = textfill
-        this.textsize = textsize
+        this.textsize = 60*(height/100)
         this.fill = fill
         this.border = border
-        this.lineWidth = lineWidth
+        this.lineWidth = 30*(height/100)
     }
     checkIfClicked() {
         if(mouse.down === 0) {
-            if(pointRect(mouse.x, mouse.y, this.x - (this.width/2) - 15, this.y - (this.height/2) - 15, this.width + 15, this.height + 30)){
+            if(pointRect(mouse.x, mouse.y, this.x - 15, this.y - 15, this.width + 15, this.height + 30)){
                 mouse.down = false
                 return true
             }
@@ -25,15 +25,15 @@ class Button {
         ctx.lineJoin  = 'round'
         ctx.lineWidth = this.lineWidth
         ctx.strokeStyle = this.border
-        ctx.strokeRect(this.x - (this.width/2), this.y - (this.height/2), this.width, this.height)
+        ctx.strokeRect(this.x, this.y, this.width, this.height)
         ctx.fillStyle = this.fill
         ctx.beginPath()
-        ctx.roundRect(this.x - (this.width/2), this.y - (this.height/2) - 7, this.width, this.height, 15)
+        ctx.roundRect(this.x, this.y - (7*(this.height/100)), this.width, this.height, 15)
         ctx.closePath()
         ctx.fill()
         
         // Text
-        drawNjText(this.text, this.x, this.y, this.textsize, this.textfill, this.border, 20)
+        drawNjText(this.text, this.x+ (this.width/2), this.y + (this.height/2), this.textsize, this.textfill, this.border, this.lineWidth-(10*(this.textsize/60)))
     }
 }
 

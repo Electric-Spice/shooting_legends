@@ -29,6 +29,8 @@ resizeScreen(1920, 1080)
 // Object
 let play_button
 let option_button
+let back_button
+let level_buttons
 
 // Mouse
 const mouse = {
@@ -59,10 +61,26 @@ function changeScene(newScene) {
 
 		case 'Main_Menu':
 			screen.style.backgroundColor = '#222224'
-			play_button = new Button('Play', 960, 700, 400, 100, '#222224', '#333336')
-			option_button = new Button('Options', 960, 900, 400, 100, '#222224', '#333336')
+			play_button = new Button('Play', 960, 700, 400, 100, '#222224', 60, '#333336')
+			option_button = new Button('Options', 960, 900, 400, 100, '#222224', 60, '#333336')
 			break;
-	
+		case 'Level_Select':
+			screen.style.backgroundColor = '#222224'
+			back_button = new Button('Back', 960, 980, 400, 100, '#222224', 60, '#333336')
+			level_buttons = []
+			// Tutorial
+			level_buttons.push(new Button('Tutorial', 260, 540, 400, 100, '#222224', 60, '#333336'))
+			// Number Levels
+			level_buttons.push(new Button('1', 660, 400, 100, 100, '#222224', 60, '#333336'))
+			level_buttons.push(new Button('2', 960, 250, 100, 100, '#222224', 60, '#333336'))
+			level_buttons.push(new Button('3', 1260, 400, 100, 100, '#222224', 60, '#333336'))
+			level_buttons.push(new Button('4', 660, 680, 100, 100, '#222224', 60, '#333336'))
+			level_buttons.push(new Button('5', 960, 830, 100, 100, '#222224', 60, '#333336'))
+			level_buttons.push(new Button('6', 1260, 680, 100, 100, '#222224', 60, '#333336'))
+			level_buttons.push(new Button('7', 960, 540, 200, 200, '#222224', 120, '#333336', '#000000', 60))
+			// Endless
+			level_buttons.push(new Button('Endless', 1660, 540, 400, 100, '#222224', 60, '#333336'))
+			break;
 		default:
 			screen.style.backgroundColor = '#ffffff'
 			break;
@@ -92,28 +110,48 @@ function draw() {
 			break;
 		case 'Main_Menu':
 			// Title
-			ctx.font = '100px njnaruto'
-			ctx.lineWidth = 35;        
-			ctx.textAlign = "center"
-			ctx.strokeStyle = '#000000'
-			ctx.lineJoin  = 'round'
-			ctx.strokeText('Shooting', 960, 275)
-			ctx.strokeText('Legends', 960, 375)
-			ctx.fillStyle = '#333336'
-			ctx.fillText('Shooting', 960, 265)
-			ctx.fillText('Legends', 960, 365)
-
+			drawNjText('Shooting', 960, 265, 100, '#333336')
+			drawNjText('Legends', 960, 365, 100, '#333336')
+			
 			// Buttons
+
 			// Buttons - Clicked
 			if(play_button.checkIfClicked()) {
-				changeScene('Main_Manu')
+				changeScene('Level_Select')
 			}
-			ctx.fillText(mouse.x, 960, 575)
+			if(option_button.checkIfClicked()) {
+				changeScene('Options')
+			}
+
 			// Buttons - Drawing
 			play_button.stamp()
 			option_button.stamp()
 			break;
-	
+		case 'Level_Select':
+			// Title
+			drawNjText('Level_Select', 960, 105, 75, '#333336')
+
+			// Button
+
+			// Level Buttons
+			for(level_button of level_buttons) {
+				// Button - Clicked
+				if(level_button.checkIfClicked()) {
+					changeScene('Main_Menu')
+				}
+				// Button - Drawing
+				level_button.stamp()
+			}
+			// Back Button
+			// Button - Clicked
+			if(back_button.checkIfClicked()) {
+				changeScene('Main_Menu')
+			}
+			// Button - Drawing
+			back_button.stamp()
+
+			
+			break;	
 		default:
 			ctx.font = '50px ariel'
 			ctx.fillStyle = 'black'
@@ -122,3 +160,15 @@ function draw() {
 	}
 }
 draw()
+
+function drawNjText(text, x, y, size, fill='white', stroke='black', lineWidth=35) {
+	ctx.textAlign = "center"
+	ctx.textBaseline = "middle"
+	ctx.lineJoin  = 'round'
+	ctx.font = `${size}px njnaruto`
+	ctx.lineWidth = lineWidth;        
+	ctx.strokeStyle = stroke
+	ctx.strokeText(text, x, y)
+	ctx.fillStyle = fill
+	ctx.fillText(text, x, y-(size/10))
+}

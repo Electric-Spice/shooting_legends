@@ -1,18 +1,23 @@
 class Button {
-    constructor(text, x, y, width, height, textfill='black', fill='white', border='black', lineWidth=30) {
+    constructor(text, x, y, width, height, textfill='black', textsize=60, fill='white', border='black', lineWidth=30) {
         this.text = text
         this.x = x
         this.y = y
         this.width = width
         this.height = height
         this.textfill = textfill
+        this.textsize = textsize
         this.fill = fill
         this.border = border
         this.lineWidth = lineWidth
     }
     checkIfClicked() {
         if(mouse.down === 0) {
-            return pointRect(mouse.x, mouse.y, this.x - (this.width/2) - 15, this.y - (this.height/2) - 15, this.width + 15, this.height + 30)
+            if(pointRect(mouse.x, mouse.y, this.x - (this.width/2) - 15, this.y - (this.height/2) - 15, this.width + 15, this.height + 30)){
+                mouse.down = false
+                return true
+            }
+            return false
         }
     }
     stamp() {
@@ -28,15 +33,7 @@ class Button {
         ctx.fill()
         
         // Text
-        ctx.font = '60px njnaruto'
-        ctx.textAlign = "center"
-        ctx.textBaseline = "middle"
-        ctx.lineWidth = 20
-        ctx.lineJoin  = 'round'
-        ctx.strokeStyle = this.border
-        ctx.strokeText(this.text, this.x, this.y)
-        ctx.fillStyle = this.textfill
-        ctx.fillText(this.text, this.x, this.y-5)
+        drawNjText(this.text, this.x, this.y, this.textsize, this.textfill, this.border, 20)
     }
 }
 

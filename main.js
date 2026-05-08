@@ -29,10 +29,12 @@ let unlocked_levels = 0
 let selected_level = null;
 
 // Object
-let play_button
-let option_button
-let back_button
-let level_buttons
+let play_button;
+let option_button;
+let back_button;
+let level_buttons;
+let player;
+let test_dummy;
 
 // Mouse
 const mouse = {
@@ -43,7 +45,6 @@ const mouse = {
 
 screen.addEventListener('mousedown', (e) => {
 	mouse.down = e.button
-	window.prompt(document.fullscreenElement?.nodeName)
 })
 screen.addEventListener('mouseup', (e) => {
 	mouse.down = false
@@ -95,6 +96,8 @@ function changeScene(newScene) {
 			break;
 		case 'Game':
 			screen.style.backgroundColor = '#ffffff'
+			player = new Tank(50, 540, 75)
+			test_dummy = new Tank(200, 540, 75)
 			break;
 		default:
 			screen.style.backgroundColor = '#ffffff'
@@ -109,11 +112,6 @@ changeScene('Start_Up_Loading')
 function draw() {
 	ctx.reset()
 	requestAnimationFrame(draw)
-	// if(fullScreen !== document.fullscreenEnabled) {
-	// 	window.prompt('hi')
-	// 	resizeScreen(1920, 1028)
-	// 	fullScreen = document.fullscreenEnabled
-	// }
 	switch (scene) {
 		case 'Start_Up_Loading':
 			// Loading Text
@@ -172,10 +170,10 @@ function draw() {
 			}
 			// Button - Drawing
 			back_button.stamp()
-
-			
 			break;
 		case 'Game':
+			// player.angle += 1
+			player.stamp()
 			break;
 		default:
 			ctx.font = '50px ariel'

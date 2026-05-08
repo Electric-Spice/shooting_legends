@@ -1,18 +1,23 @@
 class Button {
-    constructor(text, x, y, width, height, textfill='black', fill='white', border='black') {
+    constructor(text, x, y, width, height, unlocked=true, textfill='black', fill='white', border='black') {
         this.text = text
+
         this.x = x - (width/2)
         this.y = y - (height/2)
         this.width = width
         this.height = height
+
+        this.unlocked = unlocked
+
         this.textfill = textfill
         this.textsize = 60*(height/100)
+
         this.fill = fill
         this.border = border
         this.lineWidth = 30*(height/100)
     }
     checkIfClicked() {
-        if(mouse.down === 0) {
+        if(mouse.down === 0 && this.unlocked) {
             if(pointRect(mouse.x, mouse.y, this.x - 15, this.y - 15, this.width + 15, this.height + 30)){
                 mouse.down = false
                 return true
@@ -31,9 +36,22 @@ class Button {
         ctx.roundRect(this.x, this.y - (7*(this.height/100)), this.width, this.height, 15)
         ctx.closePath()
         ctx.fill()
+        if(!(this.unlocked)){
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.5)'
+            ctx.fillRect(this.x, this.y - (7*(this.height/100)), this.width, this.height)
+        }
         
         // Text
         drawNjText(this.text, this.x+ (this.width/2), this.y + (this.height/2), this.textsize, this.textfill, this.border, this.lineWidth-(10*(this.textsize/60)))
+    }
+}
+
+class Tank{
+    constructor(x, y, width, height){
+        
+    }
+    stamp(){
+
     }
 }
 

@@ -36,6 +36,21 @@ let level_buttons;
 let player;
 let test_dummy;
 
+// Mouse / Keys
+// up, down, left, right, shoot, abilitie1, abilitie2
+let keybinds = ['w', 's', 'a', 'd', 'mouse0', 'mouse1', 'mouse2']
+
+// Keys
+const keys = {
+	up: false,
+	down: false,
+	left: false,
+	right: false,
+	shoot: false,
+	abilitie1: false,
+	abilitie2: false 
+}
+
 // Mouse
 const mouse = {
 	x: 0,
@@ -45,13 +60,31 @@ const mouse = {
 
 screen.addEventListener('mousedown', (e) => {
 	mouse.down = e.button
+	if(keybinds.includes('mouse'+e.button)){
+		keys[Object.keys(keys)[keybinds.indexOf('mouse'+e.button)]] = true
+	}
 })
 screen.addEventListener('mouseup', (e) => {
 	mouse.down = false
+	if(keybinds.includes('mouse'+e.button)){
+		keys[Object.keys(keys)[keybinds.indexOf('mouse'+e.button)]] = false
+	}
 })
 screen.addEventListener('mousemove', (e) => {
 	mouse.x = Math.floor(e.offsetX/scale)
 	mouse.y = Math.floor(e.offsetY/scale)
+})
+
+addEventListener('keydown', (e) => {
+	if(keybinds.includes(e.key)){
+		keys[Object.keys(keys)[keybinds.indexOf(e.key)]] = true
+	}
+})
+
+addEventListener('keyup', (e) => {
+	if(keybinds.includes(e.key)){
+		keys[Object.keys(keys)[keybinds.indexOf(e.key)]] = false
+	}
 })
 
 // Scene
@@ -96,8 +129,8 @@ function changeScene(newScene) {
 			break;
 		case 'Game':
 			screen.style.backgroundColor = '#ffffff'
-			player = new Tank(50, 540, 75)
-			test_dummy = new Tank(200, 540, 75)
+			player = new Tank(150, 540, 75)
+			test_dummy = new Tank(1770, 540, 75)
 			break;
 		default:
 			screen.style.backgroundColor = '#ffffff'
@@ -110,7 +143,7 @@ changeScene('Start_Up_Loading')
 
 // Draw Loop
 function draw() {
-	ctx.reset()
+	ctx.clearRect(0, 0, 1920, 1080)
 	requestAnimationFrame(draw)
 	switch (scene) {
 		case 'Start_Up_Loading':
@@ -125,7 +158,7 @@ function draw() {
 
 			// Go to Main Menu
 			if(document.fonts.check("12px njnaruto")){
-				changeScene('Main_Menu')
+				changeScene('Game')
 			}
 			break;
 		case 'Main_Menu':
@@ -172,10 +205,16 @@ function draw() {
 			back_button.stamp()
 			break;
 		case 'Game':
-			// player.angle += 1
+			// Player
+			// Player - Movement
+			player.angle = Math.atan2(player.y-mouse.y, player.x-mouse.x)
+			// Player - Drawing
 			player.stamp()
+
+			test_dummy.stamp()
 			break;
 		default:
+			ctx.textAlign = "left"
 			ctx.font = '50px ariel'
 			ctx.fillStyle = 'black'
 			ctx.fillText('How did you get here?', 50, 100)

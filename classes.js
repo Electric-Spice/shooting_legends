@@ -56,10 +56,10 @@ class Tank{
     stamp(){
         // Rotate
         ctx.translate(this.x, this.y)
-        ctx.rotate((this.angle*Math.PI)/180)
+        ctx.rotate(this.angle)
 
         // Fill
-        ctx.lineWidth = 7
+        ctx.lineWidth = 7*(this.size/75)
         ctx.strokeStyle = 'black'
         ctx.fillStyle = 'white'
 
@@ -68,14 +68,14 @@ class Tank{
 
         // Body
         ctx.beginPath()
-        ctx.roundRect(-(this.size/2), -(this.size/2), this.size, this.size, 15)
+        ctx.roundRect(-(this.size/2), -(this.size/2), this.size, this.size, (15)*(this.size/75))
         ctx.closePath()
         ctx.stroke()
         ctx.fill()
 
 
         // Unrotate
-        ctx.rotate(-((this.angle*Math.PI)/180))
+        ctx.rotate(-this.angle)
         ctx.translate(-this.x, -this.y)
     }
 }
@@ -85,7 +85,7 @@ function weaponDraw(type, x, y, size) {
     switch (type) {
         case 'gun':
             ctx.beginPath()
-            ctx.roundRect(x+size, y+(size/4), size/4, size/4, 3.75)
+            ctx.roundRect(x-(size/4), y+(size/4)+(size/8), size/4, size/4, (3.75)*(size/75))
             ctx.closePath()
             ctx.stroke()
             ctx.fill()

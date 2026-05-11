@@ -25,7 +25,7 @@ function resizeScreen(GAME_WIDTH, GAME_HEIGHT) {
 resizeScreen(1920, 1080)
 
 // Variable
-let unlocked_levels = 0
+let unlocked_levels = 7
 let selected_level = null;
 
 // Object
@@ -34,7 +34,7 @@ let option_button;
 let back_button;
 let level_buttons;
 let player;
-let test_dummy;
+let enemys;
 
 // Mouse / Keys
 // up, down, left, right, shoot, abilitie1, abilitie2
@@ -57,6 +57,11 @@ const mouse = {
 	y: 0,
 	down: false
 }
+
+// Prevent Menu
+addEventListener('contextmenu', (e) => {
+	e.preventDefault()
+})
 
 screen.addEventListener('mousedown', (e) => {
 	mouse.down = e.button
@@ -128,9 +133,22 @@ function changeScene(newScene) {
 			level_buttons.push(new Button('Endless', 1660, 540, 400, 100, unlockeds[8], '#222224', '#333336'))
 			break;
 		case 'Game':
-			screen.style.backgroundColor = '#ffffff'
-			player = new Tank(150, 540, 75)
-			test_dummy = new Tank(1770, 540, 75)
+			switch (selected_level) {
+				case '1':
+					screen.style.backgroundColor = '#222224'
+					player = new Tank(150, 540, 75, '#333336')
+					enemys = []
+					enemys.push(new Tank(1770, 540, 75, '#333336'))
+					break;
+			
+				default:
+					screen.style.backgroundColor = '#ffffff'
+					player = new Tank(150, 540, 75)
+					enemys = []
+					enemys.push(new Tank(1770, 540, 75))
+					break;
+			}
+			
 			break;
 		default:
 			screen.style.backgroundColor = '#ffffff'
@@ -158,7 +176,7 @@ function draw() {
 
 			// Go to Main Menu
 			if(document.fonts.check("12px njnaruto")){
-				changeScene('Game')
+				changeScene('Main_Menu')
 			}
 			break;
 		case 'Main_Menu':
@@ -190,8 +208,8 @@ function draw() {
 			for(let level_button of level_buttons) {
 				// Button - Clicked
 				if(level_button.checkIfClicked()) {
-					changeScene('Game')
 					selected_level = level_button.text
+					changeScene('Game')
 				}
 				// Button - Drawing
 				level_button.stamp()
@@ -208,10 +226,20 @@ function draw() {
 			// Player
 			// Player - Movement
 			player.angle = Math.atan2(player.y-mouse.y, player.x-mouse.x)
+			player.x += (keys.right-keys.left)*5
+			player.y += (keys.down-keys.up)*5
 			// Player - Drawing
 			player.stamp()
 
-			test_dummy.stamp()
+			// Enemys
+			for(let enemy of enemys){
+				// Enemy - Movement
+				enemy.angle = Math.atan2(enemy.y-player.y, enemy.x-player.x)
+				enemy.x -= Math.cos(enemy.angle)*3
+				enemy.y -= Math.sin(enemy.angle)*3
+				// Enemy - Drawing
+				enemy.stamp()
+			}
 			break;
 		default:
 			ctx.textAlign = "left"

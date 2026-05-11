@@ -47,11 +47,13 @@ class Button {
 }
 
 class Tank{
-    constructor(x, y, size, angle = 0){
+    constructor(x, y, size, angle = 0, fill = 'white', border = 'black'){
         this.x = x
         this.y = y
         this.size = size
         this.angle = angle
+        this.fill = fill
+        this.border = border
     }
     stamp(){
         // Rotate
@@ -60,8 +62,8 @@ class Tank{
 
         // Fill
         ctx.lineWidth = 7*(this.size/75)
-        ctx.strokeStyle = 'black'
-        ctx.fillStyle = 'white'
+        ctx.strokeStyle = this.border
+        ctx.fillStyle = this.fill
 
         // Weapon
         weaponDraw('gun', -(this.size/2), -(this.size/2), this.size)
@@ -72,8 +74,7 @@ class Tank{
         ctx.closePath()
         ctx.stroke()
         ctx.fill()
-
-
+        
         // Unrotate
         ctx.rotate(-this.angle)
         ctx.translate(-this.x, -this.y)

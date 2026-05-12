@@ -57,11 +57,14 @@ class Tank{
 
         this.borderRadius = borderRadius
 
+        this.fill = fill
+        this.border = border
+
         this.primany_weapon = primany_weapon
         this.secondary_weapon = secondary_weapon
 
-        this.fill = fill
-        this.border = border
+        this.speedX = 0
+        this.speedY = 0
     }
     stamp(){
         // Rotate
@@ -74,8 +77,8 @@ class Tank{
         ctx.fillStyle = this.fill
 
         // Weapon
-        weaponDraw(this.primany_weapon, -(this.size/2), -(this.size/2), this.size, this.borderRadius)
-        weaponDraw(this.secondary_weapon, -(this.size/2), -(this.size/2), this.size, this.borderRadius)
+        primanyWeaponDraw(this.primany_weapon, -(this.size/2), -(this.size/2), this.size, this.borderRadius)
+        secondaryWeaponDraw(this.secondary_weapon, -(this.size/2), -(this.size/2), this.size, this.borderRadius)
 
         // Body
         ctx.beginPath()
@@ -88,10 +91,35 @@ class Tank{
         ctx.rotate(-this.angle)
         ctx.translate(-this.x, -this.y)
     }
+    hits(object){
+        return rectRect(this.x-(this.size/2), this.y-(this.size/2), this.size, this.size, object.x, object.y, object.width, object.height)
+    }
+    onStep(steps, collusions){
+        var lastStep;
+        for(let step = 0; step < steps; step += 1){
+            lastStep = this.y
+            this.y += this.speedY/steps
+            for(let collusion of collusions){
+                if(this.hits(collusion)){
+                    this.y = lastStep
+                    this.speedY = 0
+                }
+            }
+
+            lastStep = this.x
+            this.x += this.speedX/steps
+            for(let collusion of collusions){
+                if(this.hits(collusion)){
+                    this.x = lastStep
+                    this.speedX = 0
+                }
+            }
+        }
+    }
 }
 
 // Size of the Tank
-function weaponDraw(type, x, y, size, borderRadius) {
+function primanyWeaponDraw(type, x, y, size, borderRadius) {
     switch (type) {
         case 'spike':
             ctx.beginPath()
@@ -112,13 +140,51 @@ function weaponDraw(type, x, y, size, borderRadius) {
         break;
     }
 }
+function secondaryWeaponDraw(type, x, y, size, borderRadius) {
+    switch (type) {
+        case 'spike':
+            ctx.beginPath()
+            ctx.moveTo(x, y+(size/8)+(size/6)+(size/1.5))
+            ctx.lineTo(x-(size/4), y+(size/6)+(size/1.5))
+            ctx.lineTo(x, y-(size/8)+(size/6)+(size/1.5))
+            ctx.closePath()
+            ctx.stroke()
+            ctx.fill()
+            ctx.beginPath()
+            ctx.moveTo(x, y+(size/8)+(size/6))
+            ctx.lineTo(x-(size/4), y+(size/6))
+            ctx.lineTo(x, y-(size/8)+(size/6))
+            ctx.closePath()
+            ctx.stroke()
+            ctx.fill()
+        break;
+        case 'gun':
+            ctx.beginPath()
+            // (size/4)/2 == size/8
+            ctx.roundRect(x-(size/4), y-(size/8)+(size/2), size/4, size/4, (borderRadius/4)*(size/75))
+            ctx.closePath()
+            ctx.stroke()
+            ctx.fill()
+        break;
+    }
+}
 
 function pointRect(px, py, rx, ry, rw, rh) {
-    if (px >= rx &&        // right of the left edge AND
-      px <= rx + rw &&   // left of the right edge AND
-      py >= ry &&        // below the top AND
-      py <= ry + rh) {   // above the bottom
+    if (px >= rx &&      
+      px <= rx + rw &&   
+      py >= ry &&        
+      py <= ry + rh) {  
         return true;
     }
-  return false;dd
+    return false;
+}
+
+function rectRect(r1x, r1y, r1w, r1h, r2x, r2y, r2w, r2h){
+    if (r1x + r1w >= r2x && 
+      r1x <= r2x + r2w &&  
+      r1y + r1h >= r2y && 
+      r1y <= r2y + r2h) {  
+        return true;
+    }
+    return false
 }

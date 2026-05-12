@@ -1,6 +1,27 @@
 // Colors - #333336, #222224, #19191b
 
-// Ideas you can get weapons and abilities by get part from destroys tank or in cutscene (maybe not only cutscene) crates boss has more drop rates
+// Ideas 
+// you can get weapons and abilities by get part from destroys tank or 
+// in cutscene (maybe not only cutscene) crates boss has more drop rates
+// ---------------------------------------------------------------------
+// custom attacks upgrades with parts too
+// ---------------------------------------------------------------------
+// Laser Gun
+/*
+             __
+            |__|
+ ------------    \ 
+|            |     \  --
+|            |       |  | -------------------------
+|            |        --
+|            |     /   
+ ------------    /
+             __ /
+            |__|
+
+
+*/
+
 
 // Setup
 const screen = document.getElementById('screen')
@@ -31,6 +52,8 @@ let unlocked_levels = 1
 let selected_level = null;
 let primany_weapon_pressed = false
 let primany_weapon_cooldown = 5
+let secondary_weapon_pressed = false
+let secondary_weapon_cooldown = 5
 
 // Object
 let buttons = []
@@ -64,19 +87,19 @@ addEventListener('contextmenu', (e) => {
 	e.preventDefault()
 })
 
-screen.addEventListener('mousedown', (e) => {
+addEventListener('mousedown', (e) => {
 	mouse.down = e.button
 	if(keybinds.includes('mouse'+e.button)){
 		keys[Object.keys(keys)[keybinds.indexOf('mouse'+e.button)]] = true
 	}
 })
-screen.addEventListener('mouseup', (e) => {
+addEventListener('mouseup', (e) => {
 	mouse.down = false
 	if(keybinds.includes('mouse'+e.button)){
 		keys[Object.keys(keys)[keybinds.indexOf('mouse'+e.button)]] = false
 	}
 })
-screen.addEventListener('mousemove', (e) => {
+addEventListener('mousemove', (e) => {
 	mouse.x = Math.floor(e.offsetX/scale)
 	mouse.y = Math.floor(e.offsetY/scale)
 })
@@ -138,7 +161,7 @@ function changeScene(newScene) {
 			buttons.push(new Button('Back', 960, 980, 400, 100, () => {changeScene('Main_Menu');}, true, '#222224', '#333336'))
 			break;
 		case 'Game':
-			player = new Tank(150, 540, 75, 0, 15, '#333336', '#000000', )
+			player = new Tank(150, 540, 75, 0, 15, '#333336', '#000000', 'gun', 'spike')
 			enemys = []
 			switch (selected_level) {
 				case '1':
@@ -216,7 +239,6 @@ function draw() {
 		case 'Game':
 			// Player
 			// Player - Weapon Uses
-			ctx.font = '50px ariel'
 			if(keys.primany_weapon && primany_weapon_cooldown === 0){
 				primany_weapon_pressed = true
 			}else if((primany_weapon_pressed === false && primany_weapon_cooldown != 0)){
@@ -226,24 +248,57 @@ function draw() {
 						primany_weapon_cooldown = Number(primany_weapon_cooldown.toFixed(2))
 						break;
 				}
-				ctx.font = '50px ariel'
-				ctx.fillText(primany_weapon_cooldown, player.x, player.y)
+				ctx.font = '25px ariel'
+				ctx.textBaseline = "bottom"
+				ctx.fillStyle = 'black'
+				ctx.fillText(primany_weapon_cooldown, player.x, player.y-50)
+			}
+			if(keys.secondary_weapon && secondary_weapon_cooldown === 0){
+				secondary_weapon_pressed = true
+				// here
+			}else if((primany_weapon_pressed === false && primany_weapon_cooldown != 0)){
+				switch (player.primany_weapon) {
+					case 'spike':
+						primany_weapon_cooldown -= 0.1
+						primany_weapon_cooldown = Number(primany_weapon_cooldown.toFixed(2))
+						break;
+				}
+				ctx.font = '25px ariel'
+				ctx.textBaseline = "bottom"
+				ctx.fillStyle = 'black'
+				ctx.fillText(primany_weapon_cooldown, player.x, player.y-50)
 			}
 			// Player - Movement
 			if(!(primany_weapon_pressed && player.primany_weapon === 'spike')){
 				player.angle = Math.atan2(player.y-mouse.y, player.x-mouse.x)
-				player.x += (keys.right-keys.left)*5
-				player.y += (keys.down-keys.up)*5
+				player.speedX = (keys.right-keys.left)*5
+				player.speedY = (keys.down-keys.up)*5
+				player.onStep(Math.abs(player.speedX) + Math.abs(player.speedY), [{x: 0, y: 0, width: 1, height: 1080}, {x: 1920, y: 0, width: 1, height: 1080}, {x: 0, y: 0, width: 1920, height: 1}, {x: 0, y: 1080, width: 1920, height: 1}])
 			}
 			if(primany_weapon_pressed){
 				switch (player.primany_weapon) {
 					case 'spike':
-						player.x -= Math.cos(player.angle)*50
-						player.y -= Math.sin(player.angle)*50
+						player.speedX = -(Math.cos(player.angle)*50)
+						player.speedY = -(Math.sin(player.angle)*50)
+						player.onStep(Math.abs(player.speedX) + Math.abs(player.speedY), [{x: 0, y: 0, width: 1, height: 1080}, {x: 1920, y: 0, width: 1, height: 1080}])
 						primany_weapon_cooldown += 0.5
 						primany_weapon_cooldown = Number(primany_weapon_cooldown.toFixed(2))
-						if(primany_weapon_cooldown == 5){
+						if(primany_weapon_cooldown === 5){
 							primany_weapon_pressed = false
+						}
+						break;
+				}
+			}
+			if(secondary_weapon_pressed){
+				switch (player.secondary_weapon) {
+					case 'spike':
+						player.speedX = -(Math.cos(player.angle)*50)
+						player.speedY = -(Math.sin(player.angle)*50)
+						player.onStep(Math.abs(player.speedX) + Math.abs(player.speedY), [{x: 0, y: 0, width: 1, height: 1080}, {x: 1920, y: 0, width: 1, height: 1080}])
+						secondary_weapon_cooldown += 0.5
+						secondary_weapon_cooldown = Number(primany_weapon_cooldown.toFixed(2))
+						if(secondary_weapon_cooldown === 5){
+							secondary_weapon_pressed = false
 						}
 						break;
 				}

@@ -1,5 +1,7 @@
 // Colors - #333336, #222224, #19191b
 
+// Ideas you can get abilities by get part from destroys tank or in cutscene (maybe not only cutscene) crates boss has more drop rates
+
 // Setup
 const screen = document.getElementById('screen')
 const ctx = screen.getContext('2d')
@@ -29,10 +31,7 @@ let unlocked_levels = 7
 let selected_level = null;
 
 // Object
-let play_button;
-let option_button;
-let back_button;
-let level_buttons;
+let buttons = []
 let player;
 let enemys;
 
@@ -103,13 +102,15 @@ function changeScene(newScene) {
 
 		case 'Main_Menu':
 			screen.style.backgroundColor = '#222224'
-			play_button = new Button('Play', 960, 730, 400, 100, true, '#222224', '#333336')
-			option_button = new Button('Options', 960, 900, 400, 100, true, '#222224', '#333336')
+			// Play, Customize, Options
+			buttons = []
+			buttons.push(new Button('Play', 960, 610, 400, 100,  () => {changeScene('Level_Select')}, true, '#222224', '#333336'))
+			buttons.push(new Button('Customize', 960, 780, 400, 100, () => {changeScene('Customize')}, true, '#222224', '#333336'))
+			buttons.push(new Button('Options', 960, 950, 400, 100, () => {changeScene('Options')}, true, '#222224', '#333336'))
 			break;
 		case 'Level_Select':
 			screen.style.backgroundColor = '#222224'
-			back_button = new Button('Back', 960, 980, 400, 100, true, '#222224', '#333336')
-			level_buttons = []
+			buttons = []
 			let unlockeds = []
 			
 			for(let i = 0; i < 9; i++){
@@ -120,32 +121,32 @@ function changeScene(newScene) {
 				}
 			}
 			// Tutorial
-			level_buttons.push(new Button('Tutorial', 260, 540, 400, 100, unlockeds[0], '#222224', '#333336'))
+			buttons.push(new Button('Tutorial', 260, 540, 400, 100, () => {selected_level = '0'; changeScene('Game');}, true, '#222224', '#333336'))
 			// Number Levels
-			level_buttons.push(new Button('1', 660, 400, 100, 100, unlockeds[1], '#222224', '#333336'))
-			level_buttons.push(new Button('2', 960, 250, 100, 100, unlockeds[2], '#222224', '#333336'))
-			level_buttons.push(new Button('3', 1260, 400, 100, 100, unlockeds[3], '#222224', '#333336'))
-			level_buttons.push(new Button('4', 660, 680, 100, 100, unlockeds[4], '#222224', '#333336'))
-			level_buttons.push(new Button('5', 960, 830, 100, 100, unlockeds[5], '#222224', '#333336'))
-			level_buttons.push(new Button('6', 1260, 680, 100, 100, unlockeds[6], '#222224', '#333336'))
-			level_buttons.push(new Button('7', 960, 540, 200, 200, unlockeds[7], '#222224', '#333336'))
+			buttons.push(new Button('1', 660, 400, 100, 100, () => {selected_level = '1'; changeScene('Game');}, unlockeds[1], '#222224', '#333336'))
+			buttons.push(new Button('2', 960, 250, 100, 100, () => {selected_level = '2'; changeScene('Game');}, unlockeds[2], '#222224', '#333336'))
+			buttons.push(new Button('3', 1260, 400, 100, 100, () => {selected_level = '3'; changeScene('Game');}, unlockeds[3], '#222224', '#333336'))
+			buttons.push(new Button('4', 660, 680, 100, 100, () => {selected_level = '4'; changeScene('Game');}, unlockeds[4], '#222224', '#333336'))
+			buttons.push(new Button('5', 960, 830, 100, 100, () => {selected_level = '5'; changeScene('Game');}, unlockeds[5], '#222224', '#333336'))
+			buttons.push(new Button('6', 1260, 680, 100, 100, () => {selected_level = '6'; changeScene('Game');}, unlockeds[6], '#222224', '#333336'))
+			buttons.push(new Button('7', 960, 540, 200, 200, () => {selected_level = '7'; changeScene('Game');}, unlockeds[7], '#222224', '#333336'))
 			// Endless
-			level_buttons.push(new Button('Endless', 1660, 540, 400, 100, unlockeds[8], '#222224', '#333336'))
+			buttons.push(new Button('Endless', 1660, 540, 400, 100, () => {selected_level = '8'; changeScene('Game');}, unlockeds[8], '#222224', '#333336'))
+			// Back
+			buttons.push(new Button('Back', 960, 980, 400, 100, () => {changeScene('Main_Menu');}, true, '#222224', '#333336'))
 			break;
 		case 'Game':
+			player = new Tank(150, 540, 75, 0, 15, '#333336')
+			enemys = []
 			switch (selected_level) {
 				case '1':
 					screen.style.backgroundColor = '#222224'
-					player = new Tank(150, 540, 75, '#333336')
-					enemys = []
-					enemys.push(new Tank(1770, 540, 75, '#333336'))
+					enemys.push(new Tank(1770, 540, 75, 0, 5, '#380909', '#1d0505'))
 					break;
 			
 				default:
 					screen.style.backgroundColor = '#ffffff'
-					player = new Tank(150, 540, 75)
-					enemys = []
-					enemys.push(new Tank(1770, 540, 75))
+					enemys.push(new Tank(1770, 540, 75, 5))
 					break;
 			}
 			
@@ -181,10 +182,19 @@ function draw() {
 			break;
 		case 'Main_Menu':
 			// Title
-			drawNjText('Shooting', 960, 265, 100, '#333336')
-			drawNjText('Legends', 960, 365, 100, '#333336')
+			drawNjText('Shooting', 960, 225, 100, '#333336')
+			drawNjText('Legends', 960, 325, 100, '#333336')
 			
 			// Buttons
+
+			for(let main_buttons of buttons) {
+				// Button - Clicked
+				if(main_buttons.checkIfClicked()) {
+					main_buttons.onClick()
+				}
+				// Button - Drawing
+				main_buttons.stamp()
+			}
 
 			// Buttons - Clicked
 			if(play_button.checkIfClicked()) {
@@ -205,22 +215,14 @@ function draw() {
 			// Button
 
 			// Level Buttons
-			for(let level_button of level_buttons) {
+			for(let level_button of buttons) {
 				// Button - Clicked
 				if(level_button.checkIfClicked()) {
-					selected_level = level_button.text
-					changeScene('Game')
+					level_button.onClick()
 				}
 				// Button - Drawing
 				level_button.stamp()
 			}
-			// Back Button
-			// Button - Clicked
-			if(back_button.checkIfClicked()) {
-				changeScene('Main_Menu')
-			}
-			// Button - Drawing
-			back_button.stamp()
 			break;
 		case 'Game':
 			// Player

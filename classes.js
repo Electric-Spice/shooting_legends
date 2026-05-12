@@ -1,11 +1,13 @@
 class Button {
-    constructor(text, x, y, width, height, unlocked=true, textfill='black', fill='white', border='black') {
+    constructor(text, x, y, width, height, onClick, unlocked=true, textfill='black', fill='white', border='black') {
         this.text = text
 
         this.x = x - (width/2)
         this.y = y - (height/2)
         this.width = width
         this.height = height
+
+        this.onClick = onClick
 
         this.unlocked = unlocked
 
@@ -47,11 +49,12 @@ class Button {
 }
 
 class Tank{
-    constructor(x, y, size, angle = 0, fill = 'white', border = 'black'){
+    constructor(x, y, size, angle = 0, borderRadius = 5 ,fill = 'white', border = 'black'){
         this.x = x
         this.y = y
         this.size = size
         this.angle = angle
+        this.borderRadius = borderRadius
         this.fill = fill
         this.border = border
     }
@@ -61,16 +64,16 @@ class Tank{
         ctx.rotate(this.angle)
 
         // Fill
-        ctx.lineWidth = 7*(this.size/75)
+        ctx.lineWidth = 10*(this.size/75)
         ctx.strokeStyle = this.border
         ctx.fillStyle = this.fill
 
         // Weapon
-        weaponDraw('gun', -(this.size/2), -(this.size/2), this.size)
+        weaponDraw('gun', -(this.size/2), -(this.size/2), this.size, this.borderRadius)
 
         // Body
         ctx.beginPath()
-        ctx.roundRect(-(this.size/2), -(this.size/2), this.size, this.size, (15)*(this.size/75))
+        ctx.roundRect(-(this.size/2), -(this.size/2), this.size, this.size, (this.borderRadius)*(this.size/75))
         ctx.closePath()
         ctx.stroke()
         ctx.fill()
@@ -82,11 +85,12 @@ class Tank{
 }
 
 // Size of the Tank
-function weaponDraw(type, x, y, size) {
+function weaponDraw(type, x, y, size, borderRadius) {
     switch (type) {
         case 'gun':
             ctx.beginPath()
-            ctx.roundRect(x-(size/4), y+(size/4)+(size/8), size/4, size/4, (3.75)*(size/75))
+            // (size/4)/2 == size/8
+            ctx.roundRect(x-(size/4), y-(size/8)+(size/2), size/4, size/4, (borderRadius/4)*(size/75))
             ctx.closePath()
             ctx.stroke()
             ctx.fill()
@@ -101,5 +105,5 @@ function pointRect(px, py, rx, ry, rw, rh) {
       py <= ry + rh) {   // above the bottom
         return true;
     }
-  return false;
+  return false;dd
 }

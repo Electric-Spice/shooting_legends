@@ -49,12 +49,17 @@ class Button {
 }
 
 class Tank{
-    constructor(x, y, size, angle = 0, borderRadius = 5 ,fill = 'white', border = 'black'){
+    constructor(x, y, size, angle = 0, borderRadius = 5 , fill = 'white', border = 'black', primany_weapon = 'spike', secondary_weapon = null){
         this.x = x
         this.y = y
         this.size = size
         this.angle = angle
+
         this.borderRadius = borderRadius
+
+        this.primany_weapon = primany_weapon
+        this.secondary_weapon = secondary_weapon
+
         this.fill = fill
         this.border = border
     }
@@ -69,7 +74,8 @@ class Tank{
         ctx.fillStyle = this.fill
 
         // Weapon
-        weaponDraw('gun', -(this.size/2), -(this.size/2), this.size, this.borderRadius)
+        weaponDraw(this.primany_weapon, -(this.size/2), -(this.size/2), this.size, this.borderRadius)
+        weaponDraw(this.secondary_weapon, -(this.size/2), -(this.size/2), this.size, this.borderRadius)
 
         // Body
         ctx.beginPath()
@@ -87,6 +93,15 @@ class Tank{
 // Size of the Tank
 function weaponDraw(type, x, y, size, borderRadius) {
     switch (type) {
+        case 'spike':
+            ctx.beginPath()
+            ctx.moveTo(x, y+(size/4)+(size/2))
+            ctx.lineTo(x-(size/4), y+(size/2))
+            ctx.lineTo(x, y+(size/2)-(size/4))
+            ctx.closePath()
+            ctx.stroke()
+            ctx.fill()
+        break;
         case 'gun':
             ctx.beginPath()
             // (size/4)/2 == size/8

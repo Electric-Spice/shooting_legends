@@ -1,6 +1,6 @@
 // Colors - #333336, #222224, #19191b
 
-// Ideas you can get abilities by get part from destroys tank or in cutscene (maybe not only cutscene) crates boss has more drop rates
+// Ideas you can get weapons and abilities by get part from destroys tank or in cutscene (maybe not only cutscene) crates boss has more drop rates
 
 // Setup
 const screen = document.getElementById('screen')
@@ -27,8 +27,10 @@ function resizeScreen(GAME_WIDTH, GAME_HEIGHT) {
 resizeScreen(1920, 1080)
 
 // Variable
-let unlocked_levels = 7
+let unlocked_levels = 1
 let selected_level = null;
+let primany_weapon_pressed = false
+let primany_weapon_cooldown = 5
 
 // Object
 let buttons = []
@@ -36,7 +38,7 @@ let player;
 let enemys;
 
 // Mouse / Keys
-// up, down, left, right, shoot, abilitie1, abilitie2
+// up, down, left, right, shoot, primany_weapon, secondary_weapon, ability
 let keybinds = ['w', 's', 'a', 'd', 'mouse0', 'mouse1', 'mouse2']
 
 // Keys
@@ -45,9 +47,9 @@ const keys = {
 	down: false,
 	left: false,
 	right: false,
-	shoot: false,
-	abilitie1: false,
-	abilitie2: false 
+	primany_weapon: false,
+	secondary_weapon: false,
+	ability: false 
 }
 
 // Mouse
@@ -136,7 +138,7 @@ function changeScene(newScene) {
 			buttons.push(new Button('Back', 960, 980, 400, 100, () => {changeScene('Main_Menu');}, true, '#222224', '#333336'))
 			break;
 		case 'Game':
-			player = new Tank(150, 540, 75, 0, 15, '#333336')
+			player = new Tank(150, 540, 75, 0, 15, '#333336', '#000000', )
 			enemys = []
 			switch (selected_level) {
 				case '1':
@@ -186,7 +188,6 @@ function draw() {
 			drawNjText('Legends', 960, 325, 100, '#333336')
 			
 			// Buttons
-
 			for(let main_buttons of buttons) {
 				// Button - Clicked
 				if(main_buttons.checkIfClicked()) {
@@ -196,25 +197,12 @@ function draw() {
 				main_buttons.stamp()
 			}
 
-			// Buttons - Clicked
-			if(play_button.checkIfClicked()) {
-				changeScene('Level_Select')
-			}
-			if(option_button.checkIfClicked()) {
-				changeScene('Options')
-			}
-
-			// Buttons - Drawing
-			play_button.stamp()
-			option_button.stamp()
 			break;
 		case 'Level_Select':
 			// Title
 			drawNjText('Level_Select', 960, 105, 75, '#333336')
 
 			// Button
-
-			// Level Buttons
 			for(let level_button of buttons) {
 				// Button - Clicked
 				if(level_button.checkIfClicked()) {
@@ -223,13 +211,43 @@ function draw() {
 				// Button - Drawing
 				level_button.stamp()
 			}
+
 			break;
 		case 'Game':
 			// Player
+			// Player - Weapon Uses
+			ctx.font = '50px ariel'
+			if(keys.primany_weapon && primany_weapon_cooldown === 0){
+				primany_weapon_pressed = true
+			}else if((primany_weapon_pressed === false && primany_weapon_cooldown != 0)){
+				switch (player.primany_weapon) {
+					case 'spike':
+						primany_weapon_cooldown -= 0.1
+						primany_weapon_cooldown = Number(primany_weapon_cooldown.toFixed(2))
+						break;
+				}
+				ctx.font = '50px ariel'
+				ctx.fillText(primany_weapon_cooldown, player.x, player.y)
+			}
 			// Player - Movement
-			player.angle = Math.atan2(player.y-mouse.y, player.x-mouse.x)
-			player.x += (keys.right-keys.left)*5
-			player.y += (keys.down-keys.up)*5
+			if(!(primany_weapon_pressed && player.primany_weapon === 'spike')){
+				player.angle = Math.atan2(player.y-mouse.y, player.x-mouse.x)
+				player.x += (keys.right-keys.left)*5
+				player.y += (keys.down-keys.up)*5
+			}
+			if(primany_weapon_pressed){
+				switch (player.primany_weapon) {
+					case 'spike':
+						player.x -= Math.cos(player.angle)*50
+						player.y -= Math.sin(player.angle)*50
+						primany_weapon_cooldown += 0.5
+						primany_weapon_cooldown = Number(primany_weapon_cooldown.toFixed(2))
+						if(primany_weapon_cooldown == 5){
+							primany_weapon_pressed = false
+						}
+						break;
+				}
+			}
 			// Player - Drawing
 			player.stamp()
 

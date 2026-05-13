@@ -75,17 +75,18 @@ class Tank{
         ctx.lineWidth = 10*(this.size/75)
         ctx.strokeStyle = this.border
         ctx.fillStyle = this.fill
-
+        
         // Weapon
-        primanyWeaponDraw(this.primany_weapon, -(this.size/2), -(this.size/2), this.size, this.borderRadius)
         secondaryWeaponDraw(this.secondary_weapon, -(this.size/2), -(this.size/2), this.size, this.borderRadius)
-
+        primanyWeaponDraw(this.primany_weapon, -(this.size/2), -(this.size/2), this.size, this.borderRadius)
+        
         // Body
         ctx.beginPath()
         ctx.roundRect(-(this.size/2), -(this.size/2), this.size, this.size, (this.borderRadius)*(this.size/75))
         ctx.closePath()
         ctx.stroke()
         ctx.fill()
+        
         
         // Unrotate
         ctx.rotate(-this.angle)
@@ -118,6 +119,43 @@ class Tank{
     }
 }
 
+class Bullet{
+    constructor(x, y, angle, type, radius, target, fill = 'white', border = 'black'){
+        this.x = x
+        this.y = y
+        this.angle = angle
+
+        this.type = type
+        this.radius = radius
+
+        this.target = target
+
+        this.fill = fill
+        this.border = border
+    }
+    hitsShape(x, y, width, height){
+        return circleRect(this.x, this.y, this.radius, x, y, width, height)
+    }
+    hitsBorder(){
+        if(this.hitsShape(0, 0, 1, 1920) || this.hitsShape(1920, 0, 1, 1920) || this.hitsShape(0, 0, 1080, 1) || this.hitsShape(0, 1080, 1080, 1)){
+            return true
+        }
+        return false
+    }
+    hitsTank(tank){
+        return circleRect(this.x, this.y, this.radius, tank.x, tank.y, tank.size, tank.size)
+    }
+    stamp(){
+        ctx.fillStyle = this.fill
+        ctx.strokeStyle = this.border
+        ctx.beginPath()
+        ctx.ellipse(this.x, this.y, this.radius, this.radius, 0, 0, 2 * Math.PI);
+        ctx.closePath()
+        ctx.stroke()
+        ctx.fill()
+    }
+}
+
 // Size of the Tank
 function primanyWeaponDraw(type, x, y, size, borderRadius) {
     switch (type) {
@@ -133,7 +171,7 @@ function primanyWeaponDraw(type, x, y, size, borderRadius) {
         case 'gun':
             ctx.beginPath()
             // (size/4)/2 == size/8
-            ctx.roundRect(x-(size/4), y-(size/8)+(size/2), size/4, size/4, (borderRadius/4)*(size/75))
+            ctx.roundRect((x-((size/8)-(size/2)))-(size/1.65), (y-((size/8)-(size/2))), size/4, size/4, (borderRadius/4)*(size/75))
             ctx.closePath()
             ctx.stroke()
             ctx.fill()
@@ -144,16 +182,16 @@ function secondaryWeaponDraw(type, x, y, size, borderRadius) {
     switch (type) {
         case 'spike':
             ctx.beginPath()
-            ctx.moveTo(x, y+(size/8)+(size/6)+(size/1.5))
+            ctx.moveTo(x, y+(size/6)+(size/6)+(size/1.5))
             ctx.lineTo(x-(size/4), y+(size/6)+(size/1.5))
-            ctx.lineTo(x, y-(size/8)+(size/6)+(size/1.5))
+            ctx.lineTo(x, y-(size/6)+(size/6)+(size/1.5))
             ctx.closePath()
             ctx.stroke()
             ctx.fill()
             ctx.beginPath()
-            ctx.moveTo(x, y+(size/8)+(size/6))
+            ctx.moveTo(x, y+(size/6)+(size/6))
             ctx.lineTo(x-(size/4), y+(size/6))
-            ctx.lineTo(x, y-(size/8)+(size/6))
+            ctx.lineTo(x, y-(size/6)+(size/6))
             ctx.closePath()
             ctx.stroke()
             ctx.fill()
@@ -161,7 +199,8 @@ function secondaryWeaponDraw(type, x, y, size, borderRadius) {
         case 'gun':
             ctx.beginPath()
             // (size/4)/2 == size/8
-            ctx.roundRect(x-(size/4), y-(size/8)+(size/2), size/4, size/4, (borderRadius/4)*(size/75))
+            // ((size/8)-(size/2)) = center
+            ctx.roundRect((x-((size/8)-(size/2)))-(size/1.65), (y-((size/8)-(size/2))), size/4, size/4, (borderRadius/4)*(size/75))
             ctx.closePath()
             ctx.stroke()
             ctx.fill()
@@ -187,4 +226,28 @@ function rectRect(r1x, r1y, r1w, r1h, r2x, r2y, r2w, r2h){
         return true;
     }
     return false
+}
+
+function circleRect(cx, cy, radius, rx, ry, rw, rh) {
+
+  // temporary variables to set edges for testing
+  var testX = cx;
+  var testY = cy;
+
+  // which edge is closest?
+  if (cx < rx)         testX = rx;      // test left edge
+  else if (cx > rx+rw) testX = rx+rw;   // right edge
+  if (cy < ry)         testY = ry;      // top edge
+  else if (cy > ry+rh) testY = ry+rh;   // bottom edge
+
+  // get distance from closest edges
+  var distX = cx-testX;
+  var distY = cy-testY;
+  var distance = Math.sqrt( (distX*distX) + (distY*distY) );
+
+  // if the distance is less than the radius, collision!
+  if (distance <= radius) {
+    return true;
+  }
+  return false;
 }

@@ -51,18 +51,19 @@ resizeScreen(1920, 1080)
 let unlocked_levels = 1
 let selected_level = null;
 let primany_weapon_pressed = false
-let primany_weapon_cooldown = 5
+let primany_weapon_cooldown = 1
 let secondary_weapon_pressed = false
-let secondary_weapon_cooldown = 5
+let secondary_weapon_cooldown = 1
 
 // Object
 let buttons = []
 let player;
 let enemys;
+let bullets;
 
 // Mouse / Keys
 // up, down, left, right, shoot, primany_weapon, secondary_weapon, ability
-let keybinds = ['w', 's', 'a', 'd', 'mouse0', 'mouse1', 'mouse2']
+let keybinds = ['w', 's', 'a', 'd', 'mouse0', 'mouse2', 'mouse1']
 
 // Keys
 const keys = {
@@ -122,7 +123,7 @@ let scene;
 function changeScene(newScene) {
 	switch (newScene) {
 		case 'Start_Up_Loading':
-			screen.style.backgroundColor = '#000000'
+			screen.style.roundColor = '#000000'
 			break;
 
 		case 'Main_Menu':
@@ -161,12 +162,13 @@ function changeScene(newScene) {
 			buttons.push(new Button('Back', 960, 980, 400, 100, () => {changeScene('Main_Menu');}, true, '#222224', '#333336'))
 			break;
 		case 'Game':
-			player = new Tank(150, 540, 75, 0, 15, '#333336', '#000000', 'gun', 'spike')
+			player = new Tank(150, 540, 75, 0, 15, '#333336', '#000000', 'spike', 'gun')
+			bullets = []
 			enemys = []
 			switch (selected_level) {
 				case '1':
 					screen.style.backgroundColor = '#222224'
-					enemys.push(new Tank(1770, 540, 75, 0, 5, '#380909', '#1d0505'))
+					enemys.push(new Tank(1770, 540, 75, 0, 5, '#380909', '#1d0505', 'gun', 'spike'))
 					break;
 			
 				default:
@@ -237,6 +239,20 @@ function draw() {
 
 			break;
 		case 'Game':
+			// Bullets
+			for(let bullet of bullets){
+				// Bullet
+				// Bullet Offscreen
+				if(bullet.hitsBorder()){
+					bullets.splice(bullets.indexOf(bullet), 1)
+				}
+				// Bullet - Movement
+				bullet.x -= Math.cos(bullet.angle)*10
+				bullet.y -= Math.sin(bullet.angle)*10
+				// Bullet - Drawing
+				bullet.stamp()
+			}
+
 			// Player
 			// Player - Weapon Uses
 			if(keys.primany_weapon && primany_weapon_cooldown === 0){
@@ -246,62 +262,88 @@ function draw() {
 					case 'spike':
 						primany_weapon_cooldown -= 0.1
 						primany_weapon_cooldown = Number(primany_weapon_cooldown.toFixed(2))
+						ctx.font = '25px ariel'
+						ctx.textBaseline = "bottom"
+						ctx.fillStyle = 'black'
+						ctx.fillText(primany_weapon_cooldown, player.x, player.y-50)
 						break;
-				}
-				ctx.font = '25px ariel'
-				ctx.textBaseline = "bottom"
-				ctx.fillStyle = 'black'
-				ctx.fillText(primany_weapon_cooldown, player.x, player.y-50)
-			}
-			if(keys.secondary_weapon && secondary_weapon_cooldown === 0){
-				secondary_weapon_pressed = true
-				// here
-			}else if((primany_weapon_pressed === false && primany_weapon_cooldown != 0)){
-				switch (player.primany_weapon) {
-					case 'spike':
+					case 'gun':
 						primany_weapon_cooldown -= 0.1
 						primany_weapon_cooldown = Number(primany_weapon_cooldown.toFixed(2))
+						ctx.font = '25px ariel'
+						ctx.textBaseline = "bottom"
+						ctx.fillStyle = 'black'
+						ctx.fillText(primany_weapon_cooldown, player.x, player.y-50)
 						break;
 				}
-				ctx.font = '25px ariel'
-				ctx.textBaseline = "bottom"
-				ctx.fillStyle = 'black'
-				ctx.fillText(primany_weapon_cooldown, player.x, player.y-50)
-			}
-			// Player - Movement
-			if(!(primany_weapon_pressed && player.primany_weapon === 'spike')){
-				player.angle = Math.atan2(player.y-mouse.y, player.x-mouse.x)
-				player.speedX = (keys.right-keys.left)*5
-				player.speedY = (keys.down-keys.up)*5
-				player.onStep(Math.abs(player.speedX) + Math.abs(player.speedY), [{x: 0, y: 0, width: 1, height: 1080}, {x: 1920, y: 0, width: 1, height: 1080}, {x: 0, y: 0, width: 1920, height: 1}, {x: 0, y: 1080, width: 1920, height: 1}])
 			}
 			if(primany_weapon_pressed){
 				switch (player.primany_weapon) {
 					case 'spike':
 						player.speedX = -(Math.cos(player.angle)*50)
 						player.speedY = -(Math.sin(player.angle)*50)
-						player.onStep(Math.abs(player.speedX) + Math.abs(player.speedY), [{x: 0, y: 0, width: 1, height: 1080}, {x: 1920, y: 0, width: 1, height: 1080}])
+						player.onStep(Math.abs(player.speedX) + Math.abs(player.speedY), [{x: 0, y: 0, width: 1, height: 1080}, {x: 1920, y: 0, width: 1, height: 1080}, {x: 0, y: 0, width: 1920, height: 1}, {x: 0, y: 1080, width: 1920, height: 1}])
 						primany_weapon_cooldown += 0.5
 						primany_weapon_cooldown = Number(primany_weapon_cooldown.toFixed(2))
 						if(primany_weapon_cooldown === 5){
 							primany_weapon_pressed = false
 						}
 						break;
-				}
+					case 'gun':
+						bullets.push(new Bullet(player.x+((player.size/2)*-(Math.cos(player.angle))), player.y+((player.size/2)*-(Math.sin(player.angle))), player.angle, 'gun', 7, 'enemys', player.fill))
+						primany_weapon_cooldown = 1
+						primany_weapon_pressed = false
+						break;
+					}
 			}
-			if(secondary_weapon_pressed){
+			if(keys.secondary_weapon && secondary_weapon_cooldown === 0){
+				secondary_weapon_pressed = true
+			}else if((secondary_weapon_pressed === false && secondary_weapon_cooldown != 0)){
+				switch (player.secondary_weapon) {
+					case 'spike':
+						secondary_weapon_cooldown -= 0.1
+						secondary_weapon_cooldown = Number(secondary_weapon_cooldown.toFixed(2))
+						ctx.font = '25px ariel'
+						ctx.textBaseline = "bottom"
+						ctx.fillStyle = 'black'
+						ctx.fillText(secondary_weapon_cooldown, player.x, player.y-50)
+						break;
+					case 'gun':
+						secondary_weapon_cooldown -= 0.1
+						secondary_weapon_cooldown = Number(secondary_weapon_cooldown.toFixed(2))
+						ctx.font = '25px ariel'
+						ctx.textBaseline = "bottom"
+						ctx.fillStyle = 'black'
+						ctx.fillText(secondary_weapon_cooldown, player.x, player.y-50)
+						break;
+				}
+				
+			}
+			if(secondary_weapon_pressed) {
 				switch (player.secondary_weapon) {
 					case 'spike':
 						player.speedX = -(Math.cos(player.angle)*50)
 						player.speedY = -(Math.sin(player.angle)*50)
-						player.onStep(Math.abs(player.speedX) + Math.abs(player.speedY), [{x: 0, y: 0, width: 1, height: 1080}, {x: 1920, y: 0, width: 1, height: 1080}])
+						player.onStep(Math.abs(player.speedX) + Math.abs(player.speedY), [{x: 0, y: 0, width: 1, height: 1080}, {x: 1920, y: 0, width: 1, height: 1080}, {x: 0, y: 0, width: 1920, height: 1}, {x: 0, y: 1080, width: 1920, height: 1}])
 						secondary_weapon_cooldown += 0.5
-						secondary_weapon_cooldown = Number(primany_weapon_cooldown.toFixed(2))
+						secondary_weapon_cooldown = Number(secondary_weapon_cooldown.toFixed(2))
 						if(secondary_weapon_cooldown === 5){
 							secondary_weapon_pressed = false
 						}
 						break;
+					case 'gun':
+						bullets.push(new Bullet(player.x+((player.size/2)*-(Math.cos(player.angle))), player.y+((player.size/2)*-(Math.sin(player.angle))), player.angle, 'gun', 7, 'enemys', player.fill))
+						secondary_weapon_cooldown = 1
+						secondary_weapon_pressed = false
+						break;
 				}
+			}
+			// Player - Movement
+			if(!((primany_weapon_pressed && player.primany_weapon === 'spike') || (secondary_weapon_pressed && player.secondary_weapon === 'spike'))){
+				player.angle = Math.atan2(player.y-mouse.y, player.x-mouse.x)
+				player.speedX = (keys.right-keys.left)*5
+				player.speedY = (keys.down-keys.up)*5
+				player.onStep(Math.abs(player.speedX) + Math.abs(player.speedY), [{x: 0, y: 0, width: 1, height: 1080}, {x: 1920, y: 0, width: 1, height: 1080}, {x: 0, y: 0, width: 1920, height: 1}, {x: 0, y: 1080, width: 1920, height: 1}])
 			}
 			// Player - Drawing
 			player.stamp()
@@ -310,8 +352,8 @@ function draw() {
 			for(let enemy of enemys){
 				// Enemy - Movement
 				enemy.angle = Math.atan2(enemy.y-player.y, enemy.x-player.x)
-				enemy.x -= Math.cos(enemy.angle)*3
-				enemy.y -= Math.sin(enemy.angle)*3
+				// enemy.x -= Math.cos(enemy.angle)*3
+				// enemy.y -= Math.sin(enemy.angle)*3
 				// Enemy - Drawing
 				enemy.stamp()
 			}

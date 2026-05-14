@@ -77,8 +77,7 @@ class Tank{
         ctx.fillStyle = this.fill
         
         // Weapon
-        secondaryWeaponDraw(this.secondary_weapon, -(this.size/2), -(this.size/2), this.size, this.borderRadius)
-        primanyWeaponDraw(this.primany_weapon, -(this.size/2), -(this.size/2), this.size, this.borderRadius)
+        weaponDraw(this)
         
         // Body
         ctx.beginPath()
@@ -86,7 +85,6 @@ class Tank{
         ctx.closePath()
         ctx.stroke()
         ctx.fill()
-        
         
         // Unrotate
         ctx.rotate(-this.angle)
@@ -157,21 +155,37 @@ class Bullet{
 }
 
 // Size of the Tank
+function weaponDraw(object){
+    if(object.primany_weapon != null && object.secondary_weapon != null){
+        if((object.primany_weapon+object.secondary_weapon).includes("gun") && (object.primany_weapon+object.secondary_weapon).includes("spike")){
+            primanyWeaponDraw('gun', 0, 0, object.size, object.borderRadius)
+            secondaryWeaponDraw('spike', 0, 0, object.size, object.borderRadius)
+        }else if(object.primany_weapon+object.secondary_weapon === 'spikespike'){
+            primanyWeaponDraw('spike', 0, 0, object.size, object.borderRadius)
+            secondaryWeaponDraw('spike', 0, 0, object.size, object.borderRadius)
+        }else if(object.primany_weapon+object.secondary_weapon === 'gungun'){
+            secondaryWeaponDraw('gun', 0, 0, object.size, object.borderRadius)
+        }
+    }else{
+        primanyWeaponDraw(object.secondary_weapon, object.x, object.y, object.size, object.borderRadius)
+    }
+}
+
 function primanyWeaponDraw(type, x, y, size, borderRadius) {
     switch (type) {
         case 'spike':
             ctx.beginPath()
-            ctx.moveTo(x, y+(size/4)+(size/2))
-            ctx.lineTo(x-(size/4), y+(size/2))
-            ctx.lineTo(x, y+(size/2)-(size/4))
+            ctx.moveTo(x-(size/2), y+(size/8))
+            ctx.lineTo(x-(size/4)-(size/2), y)
+            ctx.lineTo(x-(size/2), y-(size/8))
             ctx.closePath()
             ctx.stroke()
             ctx.fill()
         break;
         case 'gun':
             ctx.beginPath()
-            // (size/4)/2 == size/8
-            ctx.roundRect((x-((size/8)-(size/2)))-(size/1.65), (y-((size/8)-(size/2))), size/4, size/4, (borderRadius/4)*(size/75))
+            // (x-(size/8)) center
+            ctx.roundRect((x-(size/8))-(size/1.65), (y-(size/8)), size/4, size/4, (borderRadius/4)*(size/75))
             ctx.closePath()
             ctx.stroke()
             ctx.fill()
@@ -182,25 +196,25 @@ function secondaryWeaponDraw(type, x, y, size, borderRadius) {
     switch (type) {
         case 'spike':
             ctx.beginPath()
-            ctx.moveTo(x, y+(size/6)+(size/6)+(size/1.5))
-            ctx.lineTo(x-(size/4), y+(size/6)+(size/1.5))
-            ctx.lineTo(x, y-(size/6)+(size/6)+(size/1.5))
+            ctx.moveTo(x-(size/2), y+(size/8)+(size/3))
+            ctx.lineTo(x-(size/4)-(size/2), y+(size/3))
+            ctx.lineTo(x-(size/2), y-(size/8)+(size/3))
             ctx.closePath()
             ctx.stroke()
             ctx.fill()
             ctx.beginPath()
-            ctx.moveTo(x, y+(size/6)+(size/6))
-            ctx.lineTo(x-(size/4), y+(size/6))
-            ctx.lineTo(x, y-(size/6)+(size/6))
+            ctx.moveTo(x-(size/2), y+(size/8)-(size/3))
+            ctx.lineTo(x-(size/4)-(size/2), y-(size/3))
+            ctx.lineTo(x-(size/2), y-(size/8)-(size/3))
             ctx.closePath()
             ctx.stroke()
             ctx.fill()
         break;
         case 'gun':
             ctx.beginPath()
-            // (size/4)/2 == size/8
-            // ((size/8)-(size/2)) = center
-            ctx.roundRect((x-((size/8)-(size/2)))-(size/1.65), (y-((size/8)-(size/2))), size/4, size/4, (borderRadius/4)*(size/75))
+            // (x-(size/8)) center
+            ctx.roundRect((x-(size/8))-(size/1.65), (y-(size/8))+(size/4), size/4, size/4, (borderRadius/4)*(size/75))
+            ctx.roundRect((x-(size/8))-(size/1.65), (y-(size/8))-(size/4), size/4, size/4, (borderRadius/4)*(size/75))
             ctx.closePath()
             ctx.stroke()
             ctx.fill()

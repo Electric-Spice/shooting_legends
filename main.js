@@ -162,13 +162,13 @@ function changeScene(newScene) {
 			buttons.push(new Button('Back', 960, 980, 400, 100, () => {changeScene('Main_Menu');}, true, '#222224', '#333336'))
 			break;
 		case 'Game':
-			player = new Tank(150, 540, 75, 0, 15, '#333336', '#000000', 'spike', 'gun')
+			player = new Tank(150, 540, 75, 0, 15, '#333336', '#000000', 'gun', 'gun')
 			bullets = []
 			enemys = []
 			switch (selected_level) {
 				case '1':
 					screen.style.backgroundColor = '#222224'
-					enemys.push(new Tank(1770, 540, 75, 0, 5, '#380909', '#1d0505', 'gun', 'spike'))
+					enemys.push(new Tank(1770, 540, 75, 0, 5, '#380909', '#1d0505', 'spike', 'spike'))
 					break;
 			
 				default:
@@ -242,16 +242,15 @@ function draw() {
 			// Bullets
 			for(let bullet of bullets){
 				// Bullet
+				// Bullet - Movement
+				// bullet.x -= Math.cos(bullet.angle)*10
+				// bullet.y -= Math.sin(bullet.angle)*10
 				// Bullet Offscreen
 				if(bullet.hitsBorder()){
 					bullets.splice(bullets.indexOf(bullet), 1)
 				}
-				// Bullet - Movement
-				bullet.x -= Math.cos(bullet.angle)*10
-				bullet.y -= Math.sin(bullet.angle)*10
-				// Bullet - Drawing
-				bullet.stamp()
 			}
+			// Bullet - Drawing
 
 			// Player
 			// Player - Weapon Uses
@@ -290,7 +289,12 @@ function draw() {
 						}
 						break;
 					case 'gun':
-						bullets.push(new Bullet(player.x+((player.size/2)*-(Math.cos(player.angle))), player.y+((player.size/2)*-(Math.sin(player.angle))), player.angle, 'gun', 7, 'enemys', player.fill))
+						if(player.primany_weapon+player.secondary_weapon != 'gungun'){
+							bullets.push(new Bullet(player.x+((player.size/2)*-(Math.cos(player.angle))), player.y+((player.size/2)*-(Math.sin(player.angle))), player.angle, 'gun', 7, 'enemys', player.fill))
+						}else{
+							// here
+							bullets.push(new Bullet(player.x+((player.size/2)*-(Math.cos(player.angle))), player.y+player.size+((player.size/2)*-(Math.sin(player.angle))), player.angle, 'gun', 7, 'enemys', player.fill))
+						}
 						primany_weapon_cooldown = 1
 						primany_weapon_pressed = false
 						break;
@@ -357,6 +361,8 @@ function draw() {
 				// Enemy - Drawing
 				enemy.stamp()
 			}
+
+			bullets.forEach(bullet => bullet.stamp());
 			break;
 		default:
 			ctx.textAlign = "left"
